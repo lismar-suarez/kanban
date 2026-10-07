@@ -19,7 +19,8 @@ export default function App() {
   const [query, setQuery] = useLocalStorage("kanban-search-query", "");
 
   useEffect(() => {
-    document.title = `Kanban (${tasks.length} tareas)`;
+    const pendingTasks = tasks.filter((t) => t.status !== "done");
+    document.title = `Kanban (${pendingTasks.length} pendientes)`;
   }, [tasks]);
 
   const filteredTasks = useMemo(
