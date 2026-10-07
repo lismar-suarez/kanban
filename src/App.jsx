@@ -60,6 +60,11 @@ export default function App() {
     setTasks(tasks.filter((t) => t.status !== "done"));
   }
 
+  function resetBoard() {
+    setTasks(initialTasks);
+    setQuery("");
+  }
+
   return (
     <main>
       <h1>Kanban ({tasks.length} tareas)</h1>
@@ -70,6 +75,9 @@ export default function App() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
+      <button className="reset-board" onClick={resetBoard}>
+        Restablecer tablero
+      </button>
       <div className="board">
         {COLUMNS.map((c) => (
           <Column
