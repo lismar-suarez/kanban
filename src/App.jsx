@@ -2,7 +2,7 @@ import Column from "./components/Column";
 import TaskForm from "./components/TaskForm";
 import { COLUMNS } from "./columns";
 import { useLocalStorage } from "./hooks/useLocalStorage";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 
 const initialTasks = [
   { id: 1, title: "Diseñar la base de datos", status: "done", priority: "alta" },
@@ -16,7 +16,7 @@ const initialTasks = [
 
 export default function App() {
   const [tasks, setTasks] = useLocalStorage("kanban-tasks", initialTasks);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useLocalStorage("kanban-search-query", "");
 
   useEffect(() => {
     document.title = `Kanban (${tasks.length} tareas)`;
