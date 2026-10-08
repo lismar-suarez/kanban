@@ -1,48 +1,25 @@
-import { useState } from "react";
 import { COLUMNS } from "../columns";
+import { useBoard } from "../context/BoardContext";
 
-export default function TaskCard({ task, onMove, onRemove, onEdit }) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(task.title);
+export default function TaskCard({ task }) {
+  const { moveTask, removeTask } = useBoard();
 
-  function startEdit() {
-    setDraft(task.title);
-    setEditing(true);
-  }
-
-  function saveEdit() {
-    if (draft.trim() !== "") onEdit(task.id, draft.trim());
-    setEditing(false);
-  }
+  if (!task || !task.id) return null;
 
   return (
     <article className={`card prio-${task.priority}`}>
-      {editing ? (
-        <input
-          className="card-edit"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onBlur={saveEdit}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") saveEdit();
-            if (e.key === "Escape") setEditing(false);
-          }}
-          autoFocus
-        />
-      ) : (
-        <strong onDoubleClick={startEdit}>{task.title}</strong>
-      )}
+      <strong>{task.title}</strong>
       <small>Prioridad: {task.priority}</small>
       <div className="card-actions">
         <select
           value={task.status}
-          onChange={(e) => onMove(task.id, e.target.value)}
+          onChange={(e) => moveTask(task.id, e.target.value)}
         >
           {COLUMNS.map((c) => (
             <option key={c.id} value={c.id}>{c.title}</option>
           ))}
         </select>
-        <button onClick={() => onRemove(task.id)}>Eliminar</button>
+        <button onClick={() => removeTask(task.id)}>Eliminar</button>
       </div>
     </article>
   );
