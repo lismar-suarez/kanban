@@ -1,17 +1,12 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
+import { createContext, useContext, useEffect, useReducer, useState } from "react";
+import * as api from "../api";
 
 const BoardContext = createContext(null);
-const KEY = "kanban-tasks";
-
-const initialTasks = [
-  { id: 1, title: "Diseñar la base de datos", status: "done", priority: "alta" },
-  { id: 2, title: "Crear el login", status: "doing", priority: "media" },
-  { id: 3, title: "Escribir pruebas", status: "todo", priority: "baja" },
-  { id: 4, title: "Preparar la demo", status: "todo", priority: "alta" },
-];
 
 function reducer(state, action) {
   switch (action.type) {
+    case "set":
+      return action.tasks;
     case "add":
       return [...state, action.task];
     case "move":
@@ -20,45 +15,58 @@ function reducer(state, action) {
       );
     case "remove":
       return state.filter((t) => t.id !== action.id);
-    case "reset":
-      return initialTasks;
     default:
       return state;
   }
 }
 
-function init() {
-  try {
-    const saved = localStorage.getItem(KEY);
-    return saved ? JSON.parse(saved) : initialTasks;
-  } catch {
-    return initialTasks;
-  }
-}
-
 export function BoardProvider({ children }) {
-  const [tasks, dispatch] = useReducer(reducer, null, init);
+  const [tasks, dispatch] = useReducer(reducer, []);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(tasks));
-  }, [tasks]);
+    api
+      .getTasks()
+      .then((data) => dispatch({ type: "set", tasks: data }))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
-  function addTask(title, priority) {
-    const task = { id: Date.now(), title, status: "todo", priority };
-    dispatch({ type: "add", task });
+  async function addTask(title, priority) {
+    try {
+      setError(null);
+      const task = await api.createTask(title, priority);
+      dispatch({ type: "add", task });
+    } catch (err) {
+      setError(err.message);
+    }
   }
-  function moveTask(id, status) {
-    dispatch({ type: "move", id, status });
+
+  async function moveTask(id, status) {
+    try {
+      setError(null);
+      await api.updateStatus(id, status);
+      dispatch({ type: "move", id, status });
+    } catch (err) {
+      setError(err.message);
+    }
   }
-  function removeTask(id) {
-    dispatch({ type: "remove", id });
-  }
-  function resetBoard() {
-    dispatch({ type: "reset" });
+
+  async function removeTask(id) {
+    try {
+      setError(null);
+      await api.deleteTask(id);
+      dispatch({ type: "remove", id });
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   return (
-    <BoardContext.Provider value={{ tasks, addTask, moveTask, removeTask, resetBoard }}>
+    <BoardContext.Provider
+      value={{ tasks, loading, error, addTask, moveTask, removeTask }}
+    >
       {children}
     </BoardContext.Provider>
   );

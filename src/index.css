@@ -14,4 +14,4 @@ main { max-width: 1000px; margin: auto; padding: 24px; }
 button, select { padding: 6px 10px; border-radius: 6px; border: 1px solid #d1d5db; background: #fff; cursor: pointer; }
 .card-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 4px; }
 .search { width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #d1d5db; border-radius: 6px; }
-.reset-board { margin-bottom: 16px; background: #ef4444; color: #fff; border: none; }
+.error { background: #fee2e2; color: #991b1b; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; }
